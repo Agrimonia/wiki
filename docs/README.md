@@ -1,7 +1,3 @@
----
-sidebar: false
----
-
 # Agrimonia's Wiki
 
 这里有：

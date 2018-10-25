@@ -1,3 +1,7 @@
+---
+sidebar: auto
+---
+
 # CSS 
 
 ## 盒模型
