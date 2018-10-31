@@ -29,8 +29,11 @@ sidebar: auto
 
 有两种， IE 盒子模型、W3C 盒子模型；
 盒模型： 内容(content)、填充(padding)、边界(margin)、 边框(border)；
-区  别： IE的content部分把 border 和 padding计算了进去;
-选择器：
+区别： IE的 content 部分把 border 和 padding 计算了进去;
+
+### margin 叠加
+
+## 选择器
 
 1. id选择器（ # myid）
 2. 类选择器（.myclassname）
@@ -109,15 +112,24 @@ parentElement{
 - column-span 为 all 的元素始终会创建一个新的BFC，即使该元素没有包裹在一个多列容器中（标准变更，Chrome bug）。
 - 块格式化上下文包含创建它的元素内部的所有内容.
 
-简写：
-根元素
-
-- float属性不为none
-- position为absolute或fixed
-- display为inline-block, table-cell, table-caption, flex, inline-flex
-- overflow不为visible
-
 块格式化上下文对浮动定位（参见 float）与清除浮动（参见 clear）都很重要。浮动定位和清除浮动时只会应用于同一个BFC内的元素。浮动不会影响其它BFC中元素的布局，而清除浮动只能清除同一BFC中在它前面的元素的浮动。外边距折叠（Margin collapsing）也只会发生在属于同一BFC的块级元素之间。
+
+### BFC 特性及应用
+* 同一个 BFC 下外边距会发生折叠；
+这不是 CSS 的 bug，我们可以理解为一种规范，如果想要避免外边距的重叠，可以将其放在不同的 BFC 容器中。
+
+* BFC 可以包含浮动的元素（清除浮动）；
+浮动的元素会脱离普通文档流，由于容器内元素浮动，脱离了文档流，所以容器只剩下 2px 的边距高度。如果使触发容器的 BFC，那么容器将会包裹着浮动元素。
+
+* BFC 可以阻止元素被浮动元素覆盖；
+这个方法可以用来实现两列自适应布局，效果不错，这时候左边的宽度固定，右边的内容自适应宽度(去掉上面右边内容的宽度)。
+
+* BFC的区域不会与float重叠。
+
+* 内部的盒子会在垂直方向，一个个地放置；
+* 每个元素的左边，与包含的盒子的左边相接触，即使存在浮动也是如此；
+* BFC就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素，反之也如此；
+* 计算BFC的高度时，浮动元素也参与计算。
 
 ## 清除浮动
 
@@ -151,4 +163,29 @@ BFC之所以能够清除浮动，是因为它可以包含浮动元素，所以�
 ### flex
 
 <iframe height='265' scrolling='no' title='Two-col: flex' src='//codepen.io/Agrimonia/embed/YJRJqe/?height=265&theme-id=light&default-tab=css,result' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 100%;'>See the Pen <a href='https://codepen.io/Agrimonia/pen/YJRJqe/'>Two-col: flex</a> by Lin Yongcong (<a href='https://codepen.io/Agrimonia'>@Agrimonia</a>) on <a href='https://codepen.io'>CodePen</a>.
+</iframe>
+
+## 三栏布局
+
+### flex
+
+父容器设置 `justify-content: space-between`，中间元素宽度设为 100%，容器内元素的高度撑开父容器高度。
+
+<iframe height='265' scrolling='no' title='Three-cols: flex' src='//codepen.io/Agrimonia/embed/mzQQMy/?height=265&theme-id=light&default-tab=css,result' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 100%;'>See the Pen <a href='https://codepen.io/Agrimonia/pen/mzQQMy/'>Three-cols: flex</a> by Lin Yongcong (<a href='https://codepen.io/Agrimonia'>@Agrimonia</a>) on <a href='https://codepen.io'>CodePen</a>.
+</iframe>
+
+### 圣杯布局 & 双飞翼布局
+
+圣杯布局和双飞翼布局解决的问题是一样的，都是两边定宽，中间自适应的三栏布局，中间栏要在放在文档流前面以优先渲染。 
+
+两种方法基本思路都相同：首先让中间盒子 100% 宽度占满同一高度的空间，在左右两个盒子被挤出中间盒子所在区域时，使用 margin-left 的负值将左右两个盒子拉回与中间盒子同一高度的空间。接下来进行一些调整避免中间盒子的内容被左右盒子遮挡。 
+主要区别在于 如何使中间盒子的内容不被左右盒子遮挡： 
+圣杯布局的方法：设置父盒子的 padding 值为左右盒子留出空位，再利用相对布局对左右盒子调整位置占据 padding 出来的空位； 
+双飞翼布局的方法：在中间盒子里再增加一个子盒子，直接设置这个子盒子的 margin 值来让出空位，而不用再调整左右盒子。 
+
+简单说起来就是双飞翼布局比圣杯布局多创建了一个 div，但不用相对布局了，少设置几个属性。 
+
+利用浮动元素负 margin 值，优先加载内容主体。
+
+<iframe height='265' scrolling='no' title='Three-cols: HolyGrail' src='//codepen.io/Agrimonia/embed/BqGvqV/?height=265&theme-id=light&default-tab=css,result' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 100%;'>See the Pen <a href='https://codepen.io/Agrimonia/pen/BqGvqV/'>Three-cols: HolyGrail</a> by Lin Yongcong (<a href='https://codepen.io/Agrimonia'>@Agrimonia</a>) on <a href='https://codepen.io'>CodePen</a>.
 </iframe>
